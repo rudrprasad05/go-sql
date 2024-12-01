@@ -31,7 +31,7 @@ package main
 
 import (
 	"log"
-	"path/to/connect"
+	"github.com/rudrprasad05/go-sql/connect"
 )
 
 func main() {
