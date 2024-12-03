@@ -24,7 +24,6 @@ func InitDB(config *Config) (*sql.DB, error) {
 		fmt.Println("1")
 		return nil, fmt.Errorf("failed to connect to MySQL server: %w", err)
 	}
-	defer db.Close()
 
 	// Check if the database exists
 	var exists bool
@@ -38,7 +37,7 @@ func InitDB(config *Config) (*sql.DB, error) {
 		log.Printf("Database '%s' already exists. Skipping creation.", config.DbName)
 	} else {
 		// Create the database if it doesn't exist
-		_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s", config.DbName))
+		_, err = db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS%s", config.DbName))
 		if err != nil {
 			return nil, fmt.Errorf("failed to create database '%s': %w", config.DbName, err)
 		}
@@ -56,6 +55,8 @@ func InitDB(config *Config) (*sql.DB, error) {
 	if err := dbWithSchema.Ping(); err != nil {
 		return nil, fmt.Errorf("database '%s' is unreachable: %w", config.DbName, err)
 	}
+
+	defer db.Close()
 
 	log.Printf("Connected to the database '%s' successfully.", config.DbName)
 	return dbWithSchema, nil
